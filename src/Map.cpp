@@ -35,10 +35,10 @@ std::vector<Obstacle*> Map::getListObstacle() {
     return m_list_obstacle;
 }
 
-int32_t Map::getWidth() {
+int32_t Map::getWidth() const {
     return m_width;
 }
 
-int32_t Map::getHeight() {
+int32_t Map::getHeight() const {
     return m_height;
 }

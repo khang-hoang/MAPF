@@ -50,8 +50,8 @@ public:
     // void add_obstacle(const Obstacle & t_obstacle);
     Obstacle* addObstacle(const std::vector<Point>& t_obstacle);
     std::vector<Obstacle*> getListObstacle();
-    int32_t getWidth();
-    int32_t getHeight();
+    int32_t getWidth() const;
+    int32_t getHeight() const;
 };
 
 #endif /* Map_hpp */

@@ -28,7 +28,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CFLAGS) $< -o $@ $(LDLIBS) $(LDFLAGS)
 
 run: $(OUT_DIR)/main
-	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./libs/$(UNAME)/SFML-2.5.1/lib:./libs/$(UNAME)/boost_1_71_0/lib ./$(OUT_DIR)/main
+	LD_LIBRARY_PATH=./libs/$(UNAME)/SFML-2.5.1/lib:./libs/$(UNAME)/boost_1_71_0/lib ./$(OUT_DIR)/main
 
 clean:
 	rm -rf $(OBJ_DIR) $(OUT_DIR)
