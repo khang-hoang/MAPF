@@ -19,7 +19,7 @@ dirs:
 	mkdir -p $(OUT_DIR)
 
 resources:
-	cp -r $(SRC_DIR)/Resources $(OUT_DIR)/Resources
+	rsync -aru --delete $(SRC_DIR)/Resources $(OUT_DIR)
 
 main: resources $(OBJS)
 	$(CXX) -o $(OUT_DIR)/$@ $(OBJS) $(LDLIBS) $(LDFLAGS)
@@ -27,8 +27,12 @@ main: resources $(OBJS)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CFLAGS) $< -o $@ $(LDLIBS) $(LDFLAGS)
 
-run: $(OUT_DIR)/main
+run: all
+ifeq ($(UNAME), Darwin)
+	DYLD_LIBRARY_PATH=./libs/$(UNAME)/SFML-2.5.1/lib:./libs/$(UNAME)/boost_1_71_0/lib ./$(OUT_DIR)/main
+else
 	LD_LIBRARY_PATH=./libs/$(UNAME)/SFML-2.5.1/lib:./libs/$(UNAME)/boost_1_71_0/lib ./$(OUT_DIR)/main
+endif
 
 clean:
 	rm -rf $(OBJ_DIR) $(OUT_DIR)

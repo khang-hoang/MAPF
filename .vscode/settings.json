@@ -1,7 +1,8 @@
 {
     "C_Cpp.default.includePath": [
         "src/include",
-        "/usr/local/include"
+        "libs/Darwin/boost_1_71_0/include",
+        "libs/Darwin/SFML-2.5.1/include",
     ],
     "C_Cpp.default.macFrameworkPath": ["/System/Library/Frameworks"],
     "C_Cpp.default.cppStandard": "c++11",
@@ -81,6 +82,22 @@
         "cfenv": "cpp",
         "cinttypes": "cpp",
         "hashtable": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "codecvt": "cpp",
+        "condition_variable": "cpp",
+        "csetjmp": "cpp",
+        "csignal": "cpp",
+        "coroutine": "cpp",
+        "forward_list": "cpp",
+        "future": "cpp",
+        "numeric": "cpp",
+        "queue": "cpp",
+        "random": "cpp",
+        "regex": "cpp",
+        "scoped_allocator": "cpp",
+        "strstream": "cpp",
+        "valarray": "cpp",
+        "slist": "cpp",
+        "__functional_base_03": "cpp"
     }
 }

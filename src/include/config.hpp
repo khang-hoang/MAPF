@@ -2,6 +2,7 @@
 #define __CONFIG_HPP__
 
 #include <iostream>
+#include <SFML/Graphics.hpp>
 
 class config {
 private:

@@ -27,10 +27,18 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ResourcePath.hpp"
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
+#include "config.hpp"
+#include <iostream>
 
 ////////////////////////////////////////////////////////////
 std::string getResourcePath(std::string filename)
 {
     boost::filesystem::path full_path(boost::filesystem::path(config::getExecutePath()).remove_filename() / "Resources" / filename);
+    if (!boost::filesystem::exists(full_path)) {
+        std::cout << "Can't find: " << full_path << std::endl;
+        throw 1;
+    }
     return full_path.string();
 }

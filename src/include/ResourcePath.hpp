@@ -30,10 +30,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include <string>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/path.hpp>
-#include "config.hpp"
-#include "Color.hpp"
+
 
 ////////////////////////////////////////////////////////////
 /// \brief Return the path to the resource folder.

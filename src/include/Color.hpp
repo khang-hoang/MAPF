@@ -9,6 +9,13 @@ namespace Color {
     const sf::Color Red = sf::Color(255,0,0);
     const sf::Color Blue = sf::Color(0,255,0);
     const sf::Color Green = sf::Color(0,0,255);
-}
+    const sf::Color Silver = sf::Color(189, 195, 199);
+    const sf::Color Concrete = sf::Color(149, 165, 166);
+    const sf::Color Asbestos = sf::Color(127, 140, 141);
+    const sf::Color WetAsphalt = sf::Color(52, 73, 94);
+    const sf::Color BelizeHole = sf::Color(41, 128, 185);
+    const sf::Color PeterRiver = sf::Color(52, 152, 219);
+    const sf::Color Alizarin = sf::Color(231, 76, 60);
+};
 
 #endif // __COLOR_HPP__

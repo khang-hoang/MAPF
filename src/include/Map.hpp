@@ -11,47 +11,47 @@
 
 #include <stdio.h>
 #include <vector>
-#include <boost/graph/adjacency_list.hpp>
-
-struct Point {
-    int32_t x;
-    int32_t y;
-};
-
-class Obstacle;
-
-struct VertexProperties {
-    Point pos;
-    Obstacle *obs;
-};
-
-struct EdgeProperties { int blah; };
-
-typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, VertexProperties, EdgeProperties> Graph;
-//Some typedefs for simplicity
-typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
-typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+#include "TypeDefine.hpp"
 
 class Obstacle {
 public:
-    std::vector<Vertex> list_vertex;
-    Obstacle(std::vector<Vertex> t_list_vertex);
-    void move(int32_t t_delta_x, int32_t t_delta_y);
+    std::vector<Point> listPoint;
+    Obstacle(std::vector<Point> t_listPoint);
+    void move(int32_t t_deltaX, int32_t t_deltaY);
+    void print();
+    bool contains(int32_t t_posX, int32_t t_posY);
 };
+
+// struct VertexProperties {
+//     Point pos;
+// };
+
+// struct EdgeProperties { 
+// };
+
+// typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, VertexProperties, EdgeProperties> Graph;
+// //Some typedefs for simplicity
+// typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
+// typedef boost::graph_traits<Graph>::edge_descriptor Edge;
 
 class Map {
 private:
     int32_t m_width;
     int32_t m_height;
-    Graph m_graph;
-    std::vector<Obstacle*> m_list_obstacle;
+    std::vector<Obstacle*> m_listObstacle;
+    VoronoiDiagram *m_vd;
 public:
     Map(int32_t t_width, int32_t t_height);
+    ~Map();
     // void add_obstacle(const Obstacle & t_obstacle);
     Obstacle* addObstacle(const std::vector<Point>& t_obstacle);
-    std::vector<Obstacle*> getListObstacle();
+    std::vector<Obstacle*> getListObstacle() const;
+    VoronoiDiagram* getVoronoiDiagram() const;
     int32_t getWidth() const;
     int32_t getHeight() const;
+    void constructVoronoi();
+    void saveTofile(const std::string &filename);
+    static Map readFromFile(const std::string &filename);
 };
 
 #endif /* Map_hpp */
