@@ -39,6 +39,7 @@ private:
     int32_t m_width;
     int32_t m_height;
     std::vector<Obstacle*> m_listObstacle;
+    std::vector<Point> m_listVDPoint;
     VoronoiDiagram *m_vd;
 public:
     Map(int32_t t_width, int32_t t_height);
@@ -47,6 +48,7 @@ public:
     Obstacle* addObstacle(const std::vector<Point>& t_obstacle);
     std::vector<Obstacle*> getListObstacle() const;
     VoronoiDiagram* getVoronoiDiagram() const;
+    std::vector<Point> getListVDPoint() const;
     int32_t getWidth() const;
     int32_t getHeight() const;
     void constructVoronoi();

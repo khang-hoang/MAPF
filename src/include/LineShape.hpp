@@ -18,7 +18,6 @@ namespace sf
 
 		float getLength() const;
 
-
 		virtual std::size_t getPointCount() const;
     
 		virtual Vector2f getPoint(std::size_t index) const;

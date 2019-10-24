@@ -43,6 +43,7 @@ void Obstacle::print() {
 }
 
 Map::Map(int32_t t_width, int32_t t_height) : m_width(t_width), m_height(t_height) {
+    this->m_vd = NULL;
 }
 
 Map::~Map() {
@@ -55,7 +56,8 @@ Map::~Map() {
 
 void Map::constructVoronoi() {
     std::vector<Segment> listSegment;
-    std::vector<Point> listPoint;
+    std::vector<Point> &listPoint = this->m_listVDPoint;
+    listPoint.clear();
     Point p0 = Point(0, 0);
     Point p1 = Point(0, this->m_height);
     Point p2 = Point(this->m_width, this->m_height);
@@ -68,7 +70,10 @@ void Map::constructVoronoi() {
     listSegment.push_back(Segment(p1, p2));
     listSegment.push_back(Segment(p2, p3));
     listSegment.push_back(Segment(p3, p0));
-    VoronoiDiagram *vd = new VoronoiDiagram;
+    if (!this->m_vd) {
+        this->m_vd = new VoronoiDiagram;
+    }
+    this->m_vd->clear();
     for (Obstacle *obs : this->m_listObstacle) {
         std::vector<Point>::iterator it0 = std::prev(obs->listPoint.end());
         std::vector<Point>::iterator it1 = obs->listPoint.begin();
@@ -77,14 +82,12 @@ void Map::constructVoronoi() {
             listSegment.push_back(Segment(*it0,*it1));
         }
     }
-    boost::polygon::construct_voronoi(listSegment.begin(), listSegment.end(), vd);
-    this->m_vd = vd;
+    boost::polygon::construct_voronoi(listSegment.begin(), listSegment.end(), this->m_vd);
 }
 
 void Map::saveTofile(const std::string &filename) {
     std::ofstream outFile(filename);
     outFile << this->m_width << ' ' << this->m_height << std::endl;
-    outFile << this->m_listObstacle.size() << std::endl;
     for (Obstacle *obs : this->m_listObstacle) {
         for (Point &p : obs->listPoint) {
             outFile << '(' << p.x << ',' << p.y << ") ";
@@ -98,9 +101,7 @@ Map Map::readFromFile(const std::string &filename) {
     std::ifstream inFile(filename);
     int32_t width;
     int32_t height;
-    int32_t numObstacle;
     inFile >> width >> height;
-    inFile >> numObstacle;
     std::vector<Point> listPoint;
     Map map(width, height);
     std::string line;
@@ -119,7 +120,10 @@ Map Map::readFromFile(const std::string &filename) {
                     iss >> y;
                     std::cout << x << ',' << y << std::endl;
                     listPoint.push_back(Point(x,y));
-                } else throw;
+                } else {
+                    std::cout << "faild" << std::endl;
+                    throw;
+                }
             }
             Obstacle *obs = map.addObstacle(std::vector<Point>(listPoint));
             listPoint.clear();
@@ -140,6 +144,10 @@ std::vector<Obstacle*> Map::getListObstacle() const {
 
 VoronoiDiagram* Map::getVoronoiDiagram() const {
     return this->m_vd;
+}
+
+std::vector<Point> Map::getListVDPoint() const {
+    return this->m_listVDPoint;
 }
 
 int32_t Map::getWidth() const {

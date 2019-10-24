@@ -6,12 +6,13 @@
 #include "Color.hpp"
 #include "Map.hpp"
 #include "MapView.hpp"
-#include "StatusBar.hpp"
 #include "MapEditor.hpp"
 #include "MapEditorModel.hpp"
 #include "ResourcePath.hpp"
 #include "PolygonShape.hpp"
 #include "config.hpp"
+
+const int32_t IgnoreEvent = 0xffffffff;
 
 int main(int argc, char const **argv) {
     config::setExecutePath(argv[0]);
@@ -42,10 +43,9 @@ int main(int argc, char const **argv) {
 
     // Set the Icon
     sf::Image icon;
-    if (!icon.loadFromFile(getResourcePath("icon.png"))) {
-        return EXIT_FAILURE;
+    if (icon.loadFromFile(getResourcePath("icon.png"))) {
+        window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
     }
-    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
     std::ifstream inFile(inFilename);
     Map map(MAP_WIDTH, MAP_HEIGHT);
@@ -64,9 +64,7 @@ int main(int argc, char const **argv) {
         EditMode::EditVertex
     };
     MapView mapView(map, editorModel);
-    StatusBar statusBar(editorModel);
     MapEditor mapEditor(map, editorModel, mapView);
-
 
     // PolygonShape poly({{300, 100}, {400, 400}, {200, 250}, {350,300}});
     // mapEditor.m_editorModel.test = 100;
@@ -85,6 +83,7 @@ int main(int argc, char const **argv) {
         sf::Event event;
         while (window.pollEvent(event)) {
             // Close window: exit
+            mapEditor.handleEvent(window, event);
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
@@ -100,7 +99,6 @@ int main(int argc, char const **argv) {
                 sf::FloatRect visibleArea(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
                 window.setView(sf::View(visibleArea));
             }
-            mapEditor.handleEvent(window, event);
         }
 
         // Clear screen
@@ -114,12 +112,8 @@ int main(int argc, char const **argv) {
         // Draw map
         mapView.update();
         mapView.setPosition(20, 20);
+        map.constructVoronoi();
         window.draw(mapView);
-
-        // window.draw(poly);
-
-        statusBar.setPosition(0, VIDEO_HEIGHT - statusBar.height);
-        window.draw(statusBar);
 
         // Update the window
         window.display();
