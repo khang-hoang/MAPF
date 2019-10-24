@@ -29,6 +29,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 run: all
 ifeq ($(UNAME), Darwin)
+	DYLD_FRAMEWORK_PATH=./libs/Darwin/SFML-2.5.1/extlibs/:./libs/Darwin/SFML-2.5.1/Frameworks
 	DYLD_LIBRARY_PATH=./libs/$(UNAME)/SFML-2.5.1/lib:./libs/$(UNAME)/boost_1_71_0/lib ./$(OUT_DIR)/main
 else
 	LD_LIBRARY_PATH=./libs/$(UNAME)/SFML-2.5.1/lib:./libs/$(UNAME)/boost_1_71_0/lib ./$(OUT_DIR)/main
