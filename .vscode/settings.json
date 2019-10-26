@@ -8,6 +8,7 @@
     "C_Cpp.default.cppStandard": "c++11",
     "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}",
     "files.associations": {
+        ".jshintrc": "jsonc",
         "iosfwd": "cpp",
         "__bit_reference": "cpp",
         "__config": "cpp",
@@ -98,6 +99,9 @@
         "strstream": "cpp",
         "valarray": "cpp",
         "slist": "cpp",
-        "__functional_base_03": "cpp"
+        "__functional_base_03": "cpp",
+        "rope": "cpp",
+        "filesystem": "cpp",
+        "memory_resource": "cpp"
     }
 }

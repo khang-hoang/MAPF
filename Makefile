@@ -8,7 +8,7 @@ UNAME=$(shell uname -s)
 
 CXX=g++
 INCLUDE=-I$(SRC_DIR)/include -I./libs/$(UNAME)/SFML-2.5.1/include -I./libs/$(UNAME)/boost_1_71_0/include
-CFLAGS=-g $(INCLUDE) -c -Wall -std=c++11
+CFLAGS=-g $(INCLUDE) -c -Wall -std=c++11 -fpermissive
 LDFLAGS=-L./libs/$(UNAME)/SFML-2.5.1/lib -L./libs/$(UNAME)/boost_1_71_0/lib
 LDLIBS=-lsfml-graphics -lsfml-window -lsfml-system -lboost_filesystem -lboost_system
 

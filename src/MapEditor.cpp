@@ -1,8 +1,8 @@
 #include "MapEditor.hpp"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-MapEditor::MapEditor(Map &t_map, MapEditorModel &t_model, MapView &t_mapView) : m_editorModel(t_model),  m_map(t_map), m_mapView(t_mapView) {
+MapEditor::MapEditor(Map &t_map, MapEditorModel &t_model, MapView &t_mapView) : m_editorModel(t_model), m_map(t_map), m_mapView(t_mapView) {
 }
 
 MapEditor::~MapEditor() {
@@ -20,10 +20,10 @@ void MapEditor::handleEvent(const sf::RenderWindow &t_window, sf::Event &t_event
     if (t_event.type == sf::Event::MouseButtonPressed) {
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
             sf::Vector2f pos = this->m_mapView.getMousePosition(t_window);
-            std::cout << pos.x << ',' << pos.y << std::endl;
+            // std::cout << pos.x << ',' << pos.y << std::endl;
             this->m_oldMousePos = pos;
             if (this->m_editorModel.selectedObstacle) {
-                std::vector<Point*> clickedPoints;
+                std::vector<Point *> clickedPoints;
                 for (Obstacle *obs : this->m_map.getListObstacle()) {
                     for (Point &vertex : obs->listPoint) {
                         if (circleContain(vertex.x, vertex.y, 5, pos.x, pos.y)) {
@@ -35,8 +35,7 @@ void MapEditor::handleEvent(const sf::RenderWindow &t_window, sf::Event &t_event
                     this->m_editorModel.selectedVertex = clickedPoints[0];
                 }
             }
-            // if (!this->m_editorModel.selectedObstacle) {
-            std::vector<Obstacle*> clickedObs;
+            std::vector<Obstacle *> clickedObs;
             for (Obstacle *obs : this->m_map.getListObstacle()) {
                 if (obs->contains(pos.x, pos.y)) {
                     clickedObs.push_back(obs);
@@ -54,7 +53,7 @@ void MapEditor::handleEvent(const sf::RenderWindow &t_window, sf::Event &t_event
                 Point mousePos(pos.x, pos.y);
                 double minDistance = distance(*p0, mousePos) + distance(*p1, mousePos);
                 p0 = p1++;
-                for (;p1 != listPoint.end(); p0 = p1, p1++) {
+                for (; p1 != listPoint.end(); p0 = p1, p1++) {
                     double d = distance(*p0, mousePos) + distance(*p1, mousePos);
                     if (d < minDistance) {
                         minDistance = d;

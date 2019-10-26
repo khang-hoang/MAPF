@@ -1,17 +1,19 @@
 #include "MapView.hpp"
+#include <array>
 #include "Color.hpp"
+#include "LineShape.hpp"
 #include "PolygonShape.hpp"
 #include "TypeDefine.hpp"
-#include "LineShape.hpp"
 #include "config.hpp"
-#include <array>
 
 MapView::MapView(const Map &t_map, MapEditorModel &t_model) : m_editorModel(t_model), m_map(t_map) {
-    this->m_renderer.create(this->m_map.getWidth(), this->m_map.getHeight());
-    this->m_view = sf::View(sf::FloatRect(0, 0, config::MAPVIEW_WIDTH, config::MAPVIEW_HEIGHT));
-    double widthFactor = (double)config::MAPVIEW_WIDTH/this->m_map.getWidth();
-    double heightFactor = (double)config::MAPVIEW_HEIGHT/this->m_map.getHeight();
-    this->m_view.setViewport(sf::FloatRect(0, 0, widthFactor, heightFactor));
+    const int32_t mapWidth = this->m_map.getWidth();
+    const int32_t mapHeight = this->m_map.getHeight();
+    this->m_renderer.create(mapWidth, mapHeight);
+    this->m_view = sf::View(sf::FloatRect(0, 0, mapWidth, mapHeight));
+    // double widthFactor = (double)config::MAPVIEW_WIDTH/this->m_map.getWidth();
+    // double heightFactor = (double)config::MAPVIEW_HEIGHT/this->m_map.getHeight();
+    this->m_view.setViewport(sf::FloatRect(0, 0, 1.f, 1.f));
 }
 
 void MapView::update() {
@@ -27,11 +29,11 @@ void MapView::update() {
                 point.setRadius(3);
                 point.setFillColor(Color::Alizarin);
                 point.setPosition(sf::Vector2f(vertex.x, vertex.y));
-                point.setOrigin(3,3);
+                point.setOrigin(3, 3);
                 list_point.push_back(point);
             }
         }
-        polygon.setFillColor(Color::BelizeHole);
+        polygon.setFillColor(Color::PeterRiver);
         this->m_renderer.draw(polygon);
     }
     for (const sf::CircleShape &point : list_point) {
@@ -39,24 +41,23 @@ void MapView::update() {
     }
     VoronoiDiagram *vd = this->m_map.getVoronoiDiagram();
     VoronoiDiagram::const_edge_iterator it = vd->edges().begin();
-    typedef VoronoiDiagram::vertex_type VoronoiVertex;
-    for (;it != vd->edges().end(); it++) {
+    for (; it != vd->edges().end(); it++) {
         if (!it->is_primary()) {
-            // continue;
+            continue;
         }
         if ((it->color() == 1)) {
             continue;
         }
         if (!it->is_finite()) {
-            const VoronoiVertex* v0 = it->vertex0();
-               // Again, only consider half the half-edges, ignore edge->vertex1()
-               // to avoid overdrawing the lines
+            const VoronoiVertex *v0 = it->vertex0();
+            // Again, only consider half the half-edges, ignore edge->vertex1()
+            // to avoid overdrawing the lines
             if (v0) {
                 // std::cout << "test" << std::endl;
                 // std::cout << it->cell()->source_index() << std::endl;
                 // Direction of infinite edge if perpendicular to direction
-                // between the points owning the two half edges. 
-                // Take the rotated right vector and multiply by a large 
+                // between the points owning the two half edges.
+                // Take the rotated right vector and multiply by a large
                 // enough number to reach your bounding box
                 // const std::vector<Point> &listPoint = this->m_map.getListVDPoint();
                 // Point p1 = listPoint[it->cell()->source_index()];
@@ -85,12 +86,10 @@ void MapView::update() {
 sf::Vector2f MapView::getMousePosition(const sf::RenderWindow &t_window) {
     sf::Vector2i mousePos = sf::Mouse::getPosition(t_window);
     sf::Vector2f currentPos = this->getPosition();
-    std::cout << mousePos.x - currentPos.x << ',' << mousePos.y - currentPos.y << std::endl;
-    sf::Vector2f retPos = this->m_renderer.mapPixelToCoords(sf::Vector2i(mousePos.x - currentPos.x, mousePos.y - currentPos.y), this->m_view);
-    return retPos;
+    return this->m_renderer.mapPixelToCoords(sf::Vector2i(mousePos.x - currentPos.x, mousePos.y - currentPos.y), this->m_view);
 }
 
-void MapView::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+void MapView::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     sf::RectangleShape mapRect(this->m_view.getSize());
     mapRect.setTexture(&this->m_renderer.getTexture());
     mapRect.setTextureRect(sf::IntRect(0, 0, config::MAPVIEW_WIDTH, config::MAPVIEW_HEIGHT));

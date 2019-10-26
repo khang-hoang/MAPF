@@ -1,15 +1,15 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <boost/graph/adjacency_list.hpp>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include "Color.hpp"
 #include "Map.hpp"
-#include "MapView.hpp"
 #include "MapEditor.hpp"
 #include "MapEditorModel.hpp"
-#include "ResourcePath.hpp"
+#include "MapView.hpp"
 #include "PolygonShape.hpp"
+#include "ResourcePath.hpp"
 #include "config.hpp"
 
 const int32_t IgnoreEvent = 0xffffffff;
@@ -61,8 +61,7 @@ int main(int argc, char const **argv) {
     map.constructVoronoi();
     MapEditorModel editorModel = {
         font,
-        EditMode::EditVertex
-    };
+        EditMode::EditVertex};
     MapView mapView(map, editorModel);
     MapEditor mapEditor(map, editorModel, mapView);
 
@@ -73,12 +72,12 @@ int main(int argc, char const **argv) {
     // MapRenderTexture mapRenderTexture(map);
     // sf::View mapView(sf::FloatRect(0.f, 0.f, 500, 500));
     // mapView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
-    
+
     sf::Clock clock;
-    
+
     // Start the game loop
     while (window.isOpen()) {
-        int fps = (int) (1.0 / clock.restart().asSeconds());
+        int fps = (int)(1.0 / clock.restart().asSeconds());
         // Process events
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -110,16 +109,15 @@ int main(int argc, char const **argv) {
         window.draw(fpsText);
 
         // Draw map
+        map.constructVoronoi();
         mapView.update();
         mapView.setPosition(20, 20);
-        map.constructVoronoi();
         window.draw(mapView);
 
         // Update the window
         window.display();
-        
     }
-    
+
     map.saveTofile(inFilename);
 
     return EXIT_SUCCESS;

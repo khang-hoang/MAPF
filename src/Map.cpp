@@ -7,13 +7,12 @@
 //
 
 #include "Map.hpp"
-#include <iostream>
-#include <fstream>
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
+#include <fstream>
+#include <iostream>
 
-Obstacle::Obstacle(std::vector<Point> t_listPoint) : listPoint(t_listPoint) {
-};
+Obstacle::Obstacle(std::vector<Point> t_listPoint) : listPoint(t_listPoint){};
 
 void Obstacle::move(int32_t t_deltaX, int32_t t_deltaY) {
     for (Point &point : this->listPoint) {
@@ -24,6 +23,7 @@ void Obstacle::move(int32_t t_deltaX, int32_t t_deltaY) {
 
 bool Obstacle::contains(int32_t t_posX, int32_t t_posY) {
     typedef boost::geometry::model::d2::point_xy<double> point_type;
+    typedef boost::geometry::model::pointing_segment<double> segment_type;
     typedef boost::geometry::model::polygon<point_type> Polygon;
     Polygon poly;
     for (const Point &p : this->listPoint) {
@@ -55,21 +55,26 @@ Map::~Map() {
 }
 
 void Map::constructVoronoi() {
-    std::vector<Segment> listSegment;
+    VoronoiBuilder vb;
     std::vector<Point> &listPoint = this->m_listVDPoint;
+    auto listPointContains = [](std::vector<Point> list, const Point &p0, const Point &p1) -> bool {
+        for (const Point &p : list) {
+            if ((p.x == p0.x && p.y == p0.y) || (p.x == p1.x && p.y == p1.y)) {
+                return true;
+            }
+        }
+        return false;
+    };
     listPoint.clear();
     Point p0 = Point(0, 0);
     Point p1 = Point(0, this->m_height);
     Point p2 = Point(this->m_width, this->m_height);
     Point p3 = Point(this->m_width, 0);
-    listPoint.push_back(p0);
-    listPoint.push_back(p1);
-    listPoint.push_back(p2);
-    listPoint.push_back(p3);
-    listSegment.push_back(Segment(p0, p1));
-    listSegment.push_back(Segment(p1, p2));
-    listSegment.push_back(Segment(p2, p3));
-    listSegment.push_back(Segment(p3, p0));
+    // add boundingbox line segments
+    vb.insert_segment(p0.x, p0.y, p1.x, p1.y);
+    vb.insert_segment(p1.x, p1.y, p2.x, p2.y);
+    vb.insert_segment(p2.x, p2.y, p3.x, p3.y);
+    vb.insert_segment(p3.x, p3.y, p0.x, p0.y);
     if (!this->m_vd) {
         this->m_vd = new VoronoiDiagram;
     }
@@ -77,12 +82,15 @@ void Map::constructVoronoi() {
     for (Obstacle *obs : this->m_listObstacle) {
         std::vector<Point>::iterator it0 = std::prev(obs->listPoint.end());
         std::vector<Point>::iterator it1 = obs->listPoint.begin();
-        for (;it1 != obs->listPoint.end();it0 = it1, it1++) {
+        for (; it1 != obs->listPoint.end(); it0 = it1, it1++) {
             listPoint.push_back(*it1);
-            listSegment.push_back(Segment(*it0,*it1));
+            vb.insert_segment(it0->x, it0->y, it1->x, it1->y);
         }
     }
-    boost::polygon::construct_voronoi(listSegment.begin(), listSegment.end(), this->m_vd);
+    vb.construct(this->m_vd);
+    std::vector<VoronoiCell> &listCell = const_cast<std::vector<VoronoiCell> &>(this->m_vd->cells());
+    VoronoiCell &cell = listCell[0];
+    VoronoiEdge *edge = cell.incident_edge();
 }
 
 void Map::saveTofile(const std::string &filename) {
@@ -119,9 +127,9 @@ Map Map::readFromFile(const std::string &filename) {
                     iss.ignore();
                     iss >> y;
                     std::cout << x << ',' << y << std::endl;
-                    listPoint.push_back(Point(x,y));
+                    listPoint.push_back(Point(x, y));
                 } else {
-                    std::cout << "faild" << std::endl;
+                    std::cout << "read file error." << std::endl;
                     throw;
                 }
             }
@@ -132,17 +140,17 @@ Map Map::readFromFile(const std::string &filename) {
     return map;
 }
 
-Obstacle* Map::addObstacle(const std::vector<Point>& t_listPoint) {
+Obstacle *Map::addObstacle(const std::vector<Point> &t_listPoint) {
     Obstacle *obs = new Obstacle(t_listPoint);
     this->m_listObstacle.push_back(obs);
     return obs;
 }
 
-std::vector<Obstacle*> Map::getListObstacle() const {
+std::vector<Obstacle *> Map::getListObstacle() const {
     return m_listObstacle;
 }
 
-VoronoiDiagram* Map::getVoronoiDiagram() const {
+VoronoiDiagram *Map::getVoronoiDiagram() const {
     return this->m_vd;
 }
 
