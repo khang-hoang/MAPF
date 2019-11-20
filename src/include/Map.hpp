@@ -12,27 +12,28 @@
 #include <stdio.h>
 #include <vector>
 #include "TypeDefine.hpp"
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/graph_traits.hpp>
 
 class Obstacle {
 public:
     std::vector<Point> listPoint;
     Obstacle(std::vector<Point> t_listPoint);
     void move(int32_t t_deltaX, int32_t t_deltaY);
-    void print();
-    bool contains(int32_t t_posX, int32_t t_posY);
+    bool contains(int32_t t_posX, int32_t t_posY) const;
 };
 
-// struct VertexProperties {
-//     Point pos;
-// };
+struct VertexProperties {
+    Point pos;
+};
 
-// struct EdgeProperties { 
-// };
+struct EdgeProperties {
+};
 
-// typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, VertexProperties, EdgeProperties> Graph;
-// //Some typedefs for simplicity
-// typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
-// typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, VertexProperties, EdgeProperties> Graph;
+//Some typedefs for simplicity
+typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
+typedef boost::graph_traits<Graph>::edge_descriptor Edge;
 
 class Map {
 private:
@@ -49,9 +50,9 @@ public:
     std::vector<Obstacle*> getListObstacle() const;
     VoronoiDiagram* getVoronoiDiagram() const;
     std::vector<Point> getListVDPoint() const;
+    void constructVoronoi();
     int32_t getWidth() const;
     int32_t getHeight() const;
-    void constructVoronoi();
     void saveTofile(const std::string &filename);
     static Map readFromFile(const std::string &filename);
 };

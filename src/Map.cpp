@@ -21,7 +21,7 @@ void Obstacle::move(int32_t t_deltaX, int32_t t_deltaY) {
     }
 }
 
-bool Obstacle::contains(int32_t t_posX, int32_t t_posY) {
+bool Obstacle::contains(int32_t t_posX, int32_t t_posY) const {
     typedef boost::geometry::model::d2::point_xy<double> point_type;
     typedef boost::geometry::model::pointing_segment<double> segment_type;
     typedef boost::geometry::model::polygon<point_type> Polygon;
@@ -29,17 +29,9 @@ bool Obstacle::contains(int32_t t_posX, int32_t t_posY) {
     for (const Point &p : this->listPoint) {
         boost::geometry::append(poly.outer(), point_type(p.x, p.y));
     }
-    Point &pFirst = this->listPoint[0];
+    const Point &pFirst = this->listPoint[0];
     boost::geometry::append(poly.outer(), point_type(pFirst.x, pFirst.y));
-    return boost::geometry::within(point_type(t_posX, t_posY), poly);
-}
-
-void Obstacle::print() {
-    std::cout << "============" << std::endl;
-    for (Point &point : this->listPoint) {
-        std::cout << point.x << ',' << point.y << std::endl;
-    }
-    std::cout << "============" << std::endl;
+    return boost::geometry::covered_by(point_type(t_posX, t_posY), poly);
 }
 
 Map::Map(int32_t t_width, int32_t t_height) : m_width(t_width), m_height(t_height) {
@@ -58,13 +50,21 @@ void Map::constructVoronoi() {
     VoronoiBuilder vb;
     std::vector<Point> &listPoint = this->m_listVDPoint;
     auto listPointContains = [](std::vector<Point> list, const Point &p0, const Point &p1) -> bool {
+        bool c0 = false;
+        bool c1 = false;
         for (const Point &p : list) {
-            if ((p.x == p0.x && p.y == p0.y) || (p.x == p1.x && p.y == p1.y)) {
-                return true;
+            if (p.x == p0.x && p.y == p0.y) {
+                c0 = true;
+            } else if (p.x == p1.x && p.y == p1.y) {
+                c1 = true;
             }
         }
-        return false;
+        return c0 && c1;
     };
+    if (!this->m_vd) {
+        this->m_vd = new VoronoiDiagram;
+    }
+    this->m_vd->clear();
     listPoint.clear();
     Point p0 = Point(0, 0);
     Point p1 = Point(0, this->m_height);
@@ -75,10 +75,6 @@ void Map::constructVoronoi() {
     vb.insert_segment(p1.x, p1.y, p2.x, p2.y);
     vb.insert_segment(p2.x, p2.y, p3.x, p3.y);
     vb.insert_segment(p3.x, p3.y, p0.x, p0.y);
-    if (!this->m_vd) {
-        this->m_vd = new VoronoiDiagram;
-    }
-    this->m_vd->clear();
     for (Obstacle *obs : this->m_listObstacle) {
         std::vector<Point>::iterator it0 = std::prev(obs->listPoint.end());
         std::vector<Point>::iterator it1 = obs->listPoint.begin();
@@ -88,9 +84,39 @@ void Map::constructVoronoi() {
         }
     }
     vb.construct(this->m_vd);
-    std::vector<VoronoiCell> &listCell = const_cast<std::vector<VoronoiCell> &>(this->m_vd->cells());
-    VoronoiCell &cell = listCell[0];
-    VoronoiEdge *edge = cell.incident_edge();
+    std::vector<VoronoiEdge> &list_edge = const_cast<std::vector<VoronoiEdge>&>(this->m_vd->edges());
+    for (const Obstacle *obs : this->m_listObstacle) {
+        for (VoronoiEdge &edge : list_edge) {
+            if (edge.is_primary() && edge.is_finite()) {
+                const VoronoiVertex *v0 = edge.vertex0();
+                const VoronoiVertex *v1 = edge.vertex1();
+                if (obs->contains(v0->x(), v0->y()) && obs->contains(v1->x(), v1->y())) {
+                    edge.twin()->set_secondary();
+                    edge.set_secondary();
+                }
+            }
+        }
+    }
+    // std::vector<VoronoiVertex> &list_vertex = const_cast<std::vector<VoronoiVertex>&>(this->m_vd->vertices());
+    // std::cout << "num vertices: " << list_vertex.size() << std::endl;
+    // for (const VoronoiVertex v : list_vertex) {
+    //     auto edge = v.incident_edge();
+    //     std::cout << "aaaa" << std::endl;
+    //     do {
+    //         if (edge->is_primary() && edge->is_finite()) {
+    //             auto v0 = edge->vertex0();
+    //             auto v1 = edge->vertex1();
+    //             std::cout << "v0: " << v0->x() << ',' << v0->y() << std::endl;
+    //             std::cout << "v1: " << v1->x() << ',' << v1->y() << std::endl;
+    //         }
+    //         edge = edge->rot_next();
+    //     } while (edge != v.incident_edge());
+
+    //     // std::cout << "aaaa" << std::endl;
+    //     // if (v.is_degenerate()) {
+    //         // std::cout << v.x() << ',' << v.y() << std::endl;
+    //     // }
+    // }
 }
 
 void Map::saveTofile(const std::string &filename) {
@@ -126,7 +152,6 @@ Map Map::readFromFile(const std::string &filename) {
                 if (!iss.bad() && iss.peek() == ',') {
                     iss.ignore();
                     iss >> y;
-                    std::cout << x << ',' << y << std::endl;
                     listPoint.push_back(Point(x, y));
                 } else {
                     std::cout << "read file error." << std::endl;

@@ -3,6 +3,7 @@
 
 #include <boost/polygon/polygon.hpp>
 #include <boost/polygon/voronoi.hpp>
+#include <iostream>
 
 typedef double coordinate_type;
 
@@ -292,6 +293,8 @@ class VoronoiEdge {
     }
 
     void set_secondary() {
+        const VoronoiVertex *v0 = this->vertex0();
+        const VoronoiVertex *v1 = this->vertex1();
         color_ &= BITS_MASK;
         color_ &= 0x1 << BITS_SHIFT;
     }

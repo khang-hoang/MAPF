@@ -1,8 +1,8 @@
 {
     "C_Cpp.default.includePath": [
         "src/include",
-        "libs/Darwin/boost_1_71_0/include",
-        "libs/Darwin/SFML-2.5.1/include",
+        "libs/Linux/boost_1_71_0/include",
+        "libs/Linux/SFML-2.5.1/include",
     ],
     "C_Cpp.default.macFrameworkPath": ["/System/Library/Frameworks"],
     "C_Cpp.default.cppStandard": "c++11",
