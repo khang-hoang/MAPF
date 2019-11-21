@@ -48,7 +48,7 @@ void MapView::update() {
                 this->m_renderer.draw(line);
             }
         }
-        for (Point p : v0->obsPoint) {
+        for (Point p : v0->obsPoints) {
             sf::LineShape line(sf::Vector2f(v0->x(), v0->y()), sf::Vector2f(p.x,p.y));
             line.setFillColor(Color::Green);
             line.setThickness(1);
