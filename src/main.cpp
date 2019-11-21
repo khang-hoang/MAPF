@@ -3,6 +3,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include "Color.hpp"
 #include "Map.hpp"
 #include "MapEditor.hpp"
@@ -58,7 +59,7 @@ int main(int argc, char const **argv) {
     // Obstacle *obs = map.addObstacle({{300, 450}, {400, 400}, {200, 250}, {250,300}});
     // obs->move(50,50);
     // obs->print();
-    map.constructVoronoi();
+    map.constructGraph();
     MapEditorModel editorModel = {
         font,
         EditMode::EditVertex};
@@ -108,8 +109,16 @@ int main(int argc, char const **argv) {
         fpsText.setFillColor(sf::Color::Black);
         window.draw(fpsText);
 
+        sf::Vector2f mousePos = mapEditor.getMousePos();
+        std::ostringstream ostr;
+        ostr << std::fixed << std::setprecision(2) << mousePos.x << ',' << mousePos.y;
+        sf::Text mousePosText(ostr.str(), font, 16);
+        mousePosText.setFillColor(sf::Color::Black);
+        mousePosText.setPosition(30, 0);
+        window.draw(mousePosText);
+
         // Draw map
-        map.constructVoronoi();
+        map.constructGraph();
         mapView.update();
         mapView.setPosition(20, 20);
         window.draw(mapView);

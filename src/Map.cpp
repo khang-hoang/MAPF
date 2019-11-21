@@ -7,7 +7,7 @@
 //
 
 #include "Map.hpp"
-#include <boost/geometry.hpp>
+#include <boost/geometry/geometry.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <fstream>
 #include <iostream>
@@ -34,8 +34,40 @@ bool Obstacle::contains(int32_t t_posX, int32_t t_posY) const {
     return boost::geometry::covered_by(point_type(t_posX, t_posY), poly);
 }
 
+Vertex::Vertex() : pos(0,0), visited(false) {
+
+}
+
+Vertex::Vertex(double x, double y) : pos(x, y), visited(false) {
+
+}
+
+Vertex::~Vertex() {
+}
+
+double Vertex::x() const {
+    return this->pos.x;
+}
+
+double Vertex::y() const {
+    return this->pos.y;
+}
+
+void Vertex::setPos(double x, double y) {
+    this->pos.x = x;
+    this->pos.y = y;
+}
+
+void Vertex::addObsPoint(const Point& point) {
+    for (const Point &p : this->obsPoints) {
+        if (abs(p.x - point.x) < 0.1 && abs(p.y - point.y) < 0.1) {
+            return;
+        }
+    }
+    this->obsPoints.push_back(point);
+}
+
 Map::Map(int32_t t_width, int32_t t_height) : m_width(t_width), m_height(t_height) {
-    this->m_vd = NULL;
 }
 
 Map::~Map() {
@@ -46,45 +78,46 @@ Map::~Map() {
     // delete this->m_graph;
 }
 
-void Map::constructVoronoi() {
+void Map::constructGraph() {
     VoronoiBuilder vb;
-    std::vector<Point> &listPoint = this->m_listVDPoint;
-    auto listPointContains = [](std::vector<Point> list, const Point &p0, const Point &p1) -> bool {
-        bool c0 = false;
-        bool c1 = false;
-        for (const Point &p : list) {
-            if (p.x == p0.x && p.y == p0.y) {
-                c0 = true;
-            } else if (p.x == p1.x && p.y == p1.y) {
-                c1 = true;
-            }
-        }
-        return c0 && c1;
-    };
-    if (!this->m_vd) {
-        this->m_vd = new VoronoiDiagram;
+    std::vector<Point> listPoint;
+    std::vector<Segment> listSegment;
+    VoronoiDiagram vd;
+    for (Vertex* v : this->m_list_vertex) {
+        delete v;
     }
-    this->m_vd->clear();
-    listPoint.clear();
+    this->m_list_vertex.clear();
     Point p0 = Point(0, 0);
-    Point p1 = Point(0, this->m_height);
+    Point p1 = Point(this->m_width, 0);
     Point p2 = Point(this->m_width, this->m_height);
-    Point p3 = Point(this->m_width, 0);
+    Point p3 = Point(0, this->m_height);
     // add boundingbox line segments
     vb.insert_segment(p0.x, p0.y, p1.x, p1.y);
     vb.insert_segment(p1.x, p1.y, p2.x, p2.y);
     vb.insert_segment(p2.x, p2.y, p3.x, p3.y);
     vb.insert_segment(p3.x, p3.y, p0.x, p0.y);
+    listSegment.push_back(Segment(Point(p0.x, p0.y),Point(p1.x,p1.y)));
+    listSegment.push_back(Segment(Point(p1.x, p1.y),Point(p2.x,p2.y)));
+    listSegment.push_back(Segment(Point(p2.x, p2.y),Point(p3.x,p3.y)));
+    listSegment.push_back(Segment(Point(p3.x, p3.y),Point(p0.x,p0.y)));
     for (Obstacle *obs : this->m_listObstacle) {
         std::vector<Point>::iterator it0 = std::prev(obs->listPoint.end());
         std::vector<Point>::iterator it1 = obs->listPoint.begin();
         for (; it1 != obs->listPoint.end(); it0 = it1, it1++) {
             listPoint.push_back(*it1);
             vb.insert_segment(it0->x, it0->y, it1->x, it1->y);
+            listSegment.push_back(Segment(Point(it0->x, it0->y),Point(it1->x,it1->y)));
         }
     }
-    vb.construct(this->m_vd);
-    std::vector<VoronoiEdge> &list_edge = const_cast<std::vector<VoronoiEdge>&>(this->m_vd->edges());
+    vb.construct(&vd);
+    std::vector<VoronoiVertex> &list_vertex = const_cast<std::vector<VoronoiVertex>&>(vd.vertices());
+    int32_t idx = 0;
+    for (VoronoiVertex &v : list_vertex) {
+        this->m_list_vertex.push_back(new Vertex(v.x(), v.y()));
+        v.index = idx;
+        idx++;
+    }
+    std::vector<VoronoiEdge> &list_edge = const_cast<std::vector<VoronoiEdge>&>(vd.edges());
     for (const Obstacle *obs : this->m_listObstacle) {
         for (VoronoiEdge &edge : list_edge) {
             if (edge.is_primary() && edge.is_finite()) {
@@ -94,29 +127,51 @@ void Map::constructVoronoi() {
                     edge.twin()->set_secondary();
                     edge.set_secondary();
                 }
+                if (edge.is_primary()) {
+                    Vertex *vertex0 = this->m_list_vertex[v0->index];
+                    Vertex *vertex1 = this->m_list_vertex[v1->index];
+                    vertex0->neighbors.push_back(vertex1);
+                    vertex1->neighbors.push_back(vertex0);
+                }
             }
         }
     }
-    // std::vector<VoronoiVertex> &list_vertex = const_cast<std::vector<VoronoiVertex>&>(this->m_vd->vertices());
-    // std::cout << "num vertices: " << list_vertex.size() << std::endl;
-    // for (const VoronoiVertex v : list_vertex) {
-    //     auto edge = v.incident_edge();
-    //     std::cout << "aaaa" << std::endl;
-    //     do {
-    //         if (edge->is_primary() && edge->is_finite()) {
-    //             auto v0 = edge->vertex0();
-    //             auto v1 = edge->vertex1();
-    //             std::cout << "v0: " << v0->x() << ',' << v0->y() << std::endl;
-    //             std::cout << "v1: " << v1->x() << ',' << v1->y() << std::endl;
-    //         }
-    //         edge = edge->rot_next();
-    //     } while (edge != v.incident_edge());
+    for (VoronoiEdge &edge : list_edge) {
+        if (edge.is_finite() && edge.is_primary()) {
+            auto cell = edge.cell();
+            auto v0 = edge.vertex0();
+            auto v1 = edge.vertex1();
+            auto seg = listSegment[cell->source_index()];
+            Vertex *vertex0 = this->m_list_vertex[v0->index];
+            Vertex *vertex1 = this->m_list_vertex[v1->index];
 
-    //     // std::cout << "aaaa" << std::endl;
-    //     // if (v.is_degenerate()) {
-    //         // std::cout << v.x() << ',' << v.y() << std::endl;
-    //     // }
-    // }
+            Vector2d p1p0(seg.p1.x - seg.p0.x, seg.p1.y - seg.p0.y);
+            Vector2d v0p0(v0->x() - seg.p0.x, v0->y() - seg.p0.y);
+            Vector2d v1p0(v1->x() - seg.p0.x, v1->y() - seg.p0.y);
+            double lambda0 = dot_product(v0p0,p1p0) / dot_product(p1p0,p1p0);
+            double lambda1 = dot_product(v1p0,p1p0) / dot_product(p1p0,p1p0);
+            if (vertex0->obsPoints.size() < vertex0->neighbors.size()) {
+                if (lambda0 <= 0) {
+                    vertex0->addObsPoint(seg.p0);
+                } else if (lambda0 >= 1) {
+                    vertex0->addObsPoint(seg.p1);
+                } else {
+                    Vector2d s0 = Vector2d(seg.p0.x, seg.p0.y) + lambda0*p1p0;
+                    vertex0->addObsPoint(Point(s0.x, s0.y));
+                }
+            }
+            if (vertex1->obsPoints.size() < vertex1->neighbors.size()) {
+                if (lambda1 <= 0) {
+                    vertex1->addObsPoint(seg.p0);
+                } else if (lambda1 >= 1) {
+                    vertex1->addObsPoint(seg.p1);
+                } else {
+                    Vector2d s1 = Vector2d(seg.p0.x, seg.p0.y) + lambda1*p1p0;
+                    vertex1->addObsPoint(Point(s1.x, s1.y));
+                }
+            }
+        }
+    }
 }
 
 void Map::saveTofile(const std::string &filename) {
@@ -171,16 +226,12 @@ Obstacle *Map::addObstacle(const std::vector<Point> &t_listPoint) {
     return obs;
 }
 
-std::vector<Obstacle *> Map::getListObstacle() const {
+std::vector<Obstacle*> Map::getListObstacle() const {
     return m_listObstacle;
 }
 
-VoronoiDiagram *Map::getVoronoiDiagram() const {
-    return this->m_vd;
-}
-
-std::vector<Point> Map::getListVDPoint() const {
-    return this->m_listVDPoint;
+std::vector<Vertex*> Map::getListVertex() const {
+    return m_list_vertex;
 }
 
 int32_t Map::getWidth() const {

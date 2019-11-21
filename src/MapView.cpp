@@ -39,47 +39,27 @@ void MapView::update() {
     for (const sf::CircleShape &point : list_point) {
         this->m_renderer.draw(point);
     }
-    VoronoiDiagram *vd = this->m_map.getVoronoiDiagram();
-    VoronoiDiagram::const_edge_iterator it = vd->edges().begin();
-    for (; it != vd->edges().end(); it++) {
-        if (!it->is_primary()) {
-            continue;
-        }
-        if ((it->color() == 1)) {
-            continue;
-        }
-        if (!it->is_finite()) {
-            const VoronoiVertex *v0 = it->vertex0();
-            // Again, only consider half the half-edges, ignore edge->vertex1()
-            // to avoid overdrawing the lines
-            if (v0) {
-                // std::cout << "test" << std::endl;
-                // std::cout << it->cell()->source_index() << std::endl;
-                // Direction of infinite edge if perpendicular to direction
-                // between the points owning the two half edges.
-                // Take the rotated right vector and multiply by a large
-                // enough number to reach your bounding box
-                // const std::vector<Point> &listPoint = this->m_map.getListVDPoint();
-                // Point p1 = listPoint[it->cell()->source_index()];
-                // Point p2 = listPoint[it->twin()->cell()->source_index()];
-                // int end_x = (p1.y - p2.y) * 5000;
-                // int end_y = (p1.x - pa2.x) * -5000;
-                // sf::LineShape line(sf::Vector2f(v0->x(), v0->y()), sf::Vector2f(end_x, end_y));
-                // line.setFillColor(Color::Red);
-                // line.setThickness(1);
-                // this->m_renderer.draw(line);
+    for (Vertex *v0 : this->m_map.getListVertex()) {
+        for (Vertex *v1 : v0->neighbors) {
+            if (!v1->visited) {
+                sf::LineShape line(sf::Vector2f(v0->x(), v0->y()), sf::Vector2f(v1->x(),v1->y()));
+                line.setFillColor(Color::Asbestos);
+                line.setThickness(1);
+                this->m_renderer.draw(line);
             }
-        } else {
-            double x0 = it->vertex0()->x();
-            double y0 = it->vertex0()->y();
-            double x1 = it->vertex1()->x();
-            double y1 = it->vertex1()->y();
-            sf::LineShape line(sf::Vector2f(x0, y0), sf::Vector2f(x1, y1));
-            line.setFillColor(Color::Asbestos);
+        }
+        for (Point p : v0->obsPoint) {
+            sf::LineShape line(sf::Vector2f(v0->x(), v0->y()), sf::Vector2f(p.x,p.y));
+            line.setFillColor(Color::Green);
             line.setThickness(1);
             this->m_renderer.draw(line);
         }
+        v0->visited = true;
     }
+    for (Vertex *v : this->m_map.getListVertex()) {
+        v->visited = false;
+    }
+
     this->m_renderer.display();
 }
 

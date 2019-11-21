@@ -17,6 +17,7 @@ public:
     MapEditor(Map &t_map, MapEditorModel &t_model, MapView &t_mapView);
     void handleEvent(const sf::RenderWindow &t_window, sf::Event &t_event);
     ~MapEditor();
+    sf::Vector2f getMousePos() const;
 };
 
 #endif // __MAPEDITOR_HPP__

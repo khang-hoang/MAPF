@@ -16,6 +16,10 @@ double distance(const Point &p0, const Point &p1) {
     return hypot(p1.x - p0.x, p1.y - p0.y);
 }
 
+sf::Vector2f MapEditor::getMousePos() const {
+    return this->m_oldMousePos;
+}
+
 void MapEditor::handleEvent(const sf::RenderWindow &t_window, sf::Event &t_event) {
     if (t_event.type == sf::Event::MouseButtonPressed) {
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {

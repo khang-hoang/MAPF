@@ -3,15 +3,25 @@
 
 #include <boost/polygon/polygon.hpp>
 #include <boost/polygon/voronoi.hpp>
+#include <boost/numeric/ublas/vector.hpp>
 #include <iostream>
 
 typedef double coordinate_type;
 
-struct Point {
+struct Vector2d {
     coordinate_type x;
     coordinate_type y;
-    Point(coordinate_type t_x, coordinate_type t_y) : x(t_x), y(t_y) {}
+    Vector2d(coordinate_type t_x, coordinate_type t_y) : x(t_x), y(t_y) {}
+    Vector2d(): x(0), y(0) {}
 };
+
+typedef Vector2d Point;
+Vector2d operator +(const Vector2d& vector, const Vector2d& other);
+Vector2d operator -(const Vector2d& vector);
+Vector2d operator -(const Vector2d& vector, const Vector2d& other);
+Vector2d operator *(const Vector2d& vector, const coordinate_type& val);
+Vector2d operator *(const coordinate_type& val, const Vector2d& vector);
+coordinate_type dot_product(const Vector2d& v0, const Vector2d &v1);
 
 struct Segment {
     Point p0;
@@ -136,6 +146,8 @@ class VoronoiCell {
         color_ |= color << BITS_SHIFT;
     }
 
+    int32_t idx;
+
    private:
     // 5 color bits are reserved.
     enum Bits {
@@ -179,6 +191,7 @@ class VoronoiVertex {
         color_ |= color << BITS_SHIFT;
     }
 
+    int32_t index;
    private:
     // 5 color bits are reserved.
     enum Bits {
