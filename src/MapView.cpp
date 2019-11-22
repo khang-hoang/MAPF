@@ -39,7 +39,8 @@ void MapView::update() {
     for (const sf::CircleShape &point : list_point) {
         this->m_renderer.draw(point);
     }
-    for (Vertex *v0 : this->m_map.getListVertex()) {
+    std::vector<Vertex*> graph = this->m_map.getGraph();
+    for (Vertex *v0 : graph) {
         for (Vertex *v1 : v0->neighbors) {
             if (!v1->visited) {
                 sf::LineShape line(sf::Vector2f(v0->x(), v0->y()), sf::Vector2f(v1->x(),v1->y()));
@@ -56,7 +57,7 @@ void MapView::update() {
         }
         v0->visited = true;
     }
-    for (Vertex *v : this->m_map.getListVertex()) {
+    for (Vertex *v : graph) {
         v->visited = false;
     }
 

@@ -49,7 +49,8 @@ public:
     Obstacle* addObstacle(const std::vector<Point>& t_obstacle);
     std::vector<Obstacle*> getListObstacle() const;
     void constructGraph();
-    std::vector<Vertex*> getListVertex() const;
+    std::vector<Vertex*> getGraph() const;
+    std::vector<Vertex*> cloneGraph() const;
     int32_t getWidth() const;
     int32_t getHeight() const;
     void saveTofile(const std::string &filename);

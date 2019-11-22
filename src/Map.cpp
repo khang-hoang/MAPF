@@ -24,7 +24,6 @@ void Obstacle::move(int32_t t_deltaX, int32_t t_deltaY) {
 
 bool Obstacle::contains(int32_t t_posX, int32_t t_posY) const {
     typedef boost::geometry::model::d2::point_xy<double> point_type;
-    typedef boost::geometry::model::pointing_segment<double> segment_type;
     typedef boost::geometry::model::polygon<point_type> Polygon;
     Polygon poly;
     for (const Point &p : this->listPoint) {
@@ -135,7 +134,6 @@ void Map::constructGraph() {
                 Vertex* vertex0 = it0->second;
                 Vertex* vertex1 = it1->second;
                 vertex0->neighbors.push_back(vertex1);
-                vertex1->neighbors.push_back(vertex0);
 
                 auto cell = edge.cell();
                 if (vertex0->obsPoints.size() < vertex0->neighbors.size()) {
@@ -213,8 +211,29 @@ std::vector<Obstacle*> Map::getListObstacle() const {
     return m_listObstacle;
 }
 
-std::vector<Vertex*> Map::getListVertex() const {
+std::vector<Vertex*> Map::getGraph() const {
     return m_list_vertex;
+}
+
+std::vector<Vertex*> Map::cloneGraph() const {
+    std::vector<Vertex*> list_vertex;
+    std::unordered_map<Vertex*,Vertex*> map_vertex;
+    for (Vertex *v : this->m_list_vertex) {
+        Vertex *v0 = new Vertex(v->x(),v->y());
+        v0->obsPoints = std::vector<Point>(v->obsPoints);
+        list_vertex.push_back(v0);
+        map_vertex.insert(std::make_pair(v, v0));
+    }
+    for (Vertex *v : this->m_list_vertex) {
+        auto it0 = map_vertex.find(v);
+        Vertex *v0 = it0->second;
+        for (Vertex *n : v->neighbors) {
+            auto it1 = map_vertex.find(n);
+            Vertex *v1 = it1->second;
+            v0->neighbors.push_back(v1);
+        }
+    }
+    return list_vertex;
 }
 
 int32_t Map::getWidth() const {

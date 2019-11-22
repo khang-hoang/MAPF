@@ -6,6 +6,9 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <iostream>
 
+#define PI 3.14159265359
+#define HALF_PI 1.57079632679
+
 typedef double coordinate_type;
 
 struct Vector2d {
@@ -13,14 +16,16 @@ struct Vector2d {
     coordinate_type y;
     Vector2d(coordinate_type t_x, coordinate_type t_y) : x(t_x), y(t_y) {}
     Vector2d(): x(0), y(0) {}
+    double length() const;
 };
 
 Vector2d operator +(const Vector2d& vector, const Vector2d& other);
 Vector2d operator -(const Vector2d& vector);
 Vector2d operator -(const Vector2d& vector, const Vector2d& other);
-Vector2d operator *(const Vector2d& vector, const coordinate_type& val);
-Vector2d operator *(const coordinate_type& val, const Vector2d& vector);
-coordinate_type dot_product(const Vector2d& v0, const Vector2d &v1);
+Vector2d operator *(const Vector2d& vector, const double& val);
+Vector2d operator *(const double& val, const Vector2d& vector);
+double angle_rad(const Vector2d& v0, const Vector2d &v1);
+double dot_product(const Vector2d& v0, const Vector2d &v1);
 
 typedef Vector2d Point;
 

@@ -24,7 +24,6 @@ void MapEditor::handleEvent(const sf::RenderWindow &t_window, sf::Event &t_event
     if (t_event.type == sf::Event::MouseButtonPressed) {
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
             sf::Vector2f pos = this->m_mapView.getMousePosition(t_window);
-            // std::cout << pos.x << ',' << pos.y << std::endl;
             this->m_oldMousePos = pos;
             if (this->m_editorModel.selectedObstacle) {
                 std::vector<Point *> clickedPoints;

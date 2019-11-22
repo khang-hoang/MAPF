@@ -1,4 +1,14 @@
-#include "TypeDefine.hpp"
+#include <vector>
+#include <math.h>
+#include <iostream>
+
+struct Vector2d {
+    double x;
+    double y;
+    Vector2d(double t_x, double t_y) : x(t_x), y(t_y) {}
+    Vector2d(): x(0), y(0) {}
+    double length() const;
+};
 
 double Vector2d::length() const {
     return sqrt(x*x +y*y);
@@ -31,4 +41,12 @@ double dot_product(const Vector2d& v0, const Vector2d &v1) {
 double angle_rad(const Vector2d& v0, const Vector2d &v1) {
     double val = dot_product(v0,v1)/(v0.length()*v1.length());
     return acos(val);
+}
+
+int main() {
+    Vector2d v0(0,100);
+    Vector2d v1(100,0);
+    double rad = angle_rad(v0, v1);
+    std::cout << rad << std::endl;
+    return 0;
 }
