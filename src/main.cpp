@@ -111,16 +111,15 @@ int main(int argc, char const **argv) {
 
         sf::Vector2f mousePos = mapEditor.getMousePos();
         std::ostringstream ostr;
-        ostr << std::fixed << std::setprecision(2) << mousePos.x << ',' << mousePos.y;
+        ostr << int(mousePos.x) << ',' << int(mousePos.y);
         sf::Text mousePosText(ostr.str(), font, 16);
         mousePosText.setFillColor(sf::Color::Black);
         mousePosText.setPosition(30, 0);
         window.draw(mousePosText);
 
         // Draw map
-        map.constructGraph();
-        mapView.update();
-        mapView.setPosition(20, 20);
+        // map.constructGraph();
+        mapView.setPosition(30, 30);
         window.draw(mapView);
 
         // Update the window

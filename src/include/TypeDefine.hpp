@@ -3,7 +3,10 @@
 
 #include <boost/polygon/polygon.hpp>
 #include <boost/polygon/voronoi.hpp>
-#include <boost/numeric/ublas/vector.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point.hpp>
+#include <boost/geometry/geometries/box.hpp>
+#include <boost/geometry/index/rtree.hpp>
 #include <iostream>
 
 #define PI 3.14159265359
@@ -11,10 +14,10 @@
 
 typedef double coordinate_type;
 
-struct Vector2d {
-    coordinate_type x;
-    coordinate_type y;
-    Vector2d(coordinate_type t_x, coordinate_type t_y) : x(t_x), y(t_y) {}
+struct Vector2d : public boost::geometry::model::point<double,2,boost::geometry::cs::cartesian> {
+    double x;
+    double y;
+    Vector2d(double t_x, double t_y) : x(t_x), y(t_y) {}
     Vector2d(): x(0), y(0) {}
     double length() const;
 };
@@ -96,10 +99,5 @@ struct segment_mutable_traits<Segment> {
 
 }  // namespace polygon
 }  // namespace boost
-
-typedef boost::polygon::voronoi_edge<double> VoronoiEdge;
-typedef boost::polygon::voronoi_vertex<double> VoronoiVertex;
-typedef boost::polygon::voronoi_cell<double> VoronoiCell;
-typedef boost::polygon::voronoi_diagram<double> VoronoiDiagram;
 
 #endif  // __TYPEDEFINE_HPP__

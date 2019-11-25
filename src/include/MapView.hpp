@@ -13,7 +13,6 @@ private:
     sf::View m_view;
     MapEditorModel &m_editorModel;
 public:
-    void update();
     MapView(const Map &t_map, MapEditorModel &t_model);
     sf::Vector2f getMousePosition(const sf::RenderWindow &t_window);
 };

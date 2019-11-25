@@ -16,6 +16,9 @@ namespace Color {
     const sf::Color BelizeHole = sf::Color(41, 128, 185);
     const sf::Color PeterRiver = sf::Color(52, 152, 219);
     const sf::Color Alizarin = sf::Color(231, 76, 60);
+    const sf::Color Carrot = sf::Color(230, 126, 34);
+    const sf::Color Orange = sf::Color(243, 156, 18);
+    const sf::Color MidnightBlue = sf::Color(44, 62, 80);
 };
 
 #endif // __COLOR_HPP__

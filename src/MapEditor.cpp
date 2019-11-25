@@ -64,6 +64,7 @@ void MapEditor::handleEvent(const sf::RenderWindow &t_window, sf::Event &t_event
                     }
                 }
                 listPoint.insert(it, mousePos);
+                this->m_map.constructGraph();
             } else if (tmpSelected && tmpSelected != this->m_editorModel.selectedObstacle) {
                 this->m_editorModel.selectedObstacle = tmpSelected;
             }
@@ -78,6 +79,7 @@ void MapEditor::handleEvent(const sf::RenderWindow &t_window, sf::Event &t_event
             } else if (this->m_editorModel.selectedObstacle) {
                 this->m_editorModel.selectedObstacle->move(pos.x - this->m_oldMousePos.x, pos.y - this->m_oldMousePos.y);
             }
+            this->m_map.constructGraph();
         }
         this->m_oldMousePos = pos;
     }

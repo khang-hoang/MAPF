@@ -13,6 +13,11 @@
 #include <iostream>
 #include <unordered_map>
 
+typedef boost::polygon::voronoi_edge<double> VoronoiEdge;
+typedef boost::polygon::voronoi_vertex<double> VoronoiVertex;
+typedef boost::polygon::voronoi_cell<double> VoronoiCell;
+typedef boost::polygon::voronoi_diagram<double> VoronoiDiagram;
+
 Obstacle::Obstacle(std::vector<Point> t_listPoint) : listPoint(t_listPoint){};
 
 void Obstacle::move(int32_t t_deltaX, int32_t t_deltaY) {
@@ -34,16 +39,11 @@ bool Obstacle::contains(int32_t t_posX, int32_t t_posY) const {
     return boost::geometry::within(point_type(t_posX, t_posY), poly);
 }
 
-Vertex::Vertex() : pos(0,0), visited(false) {
+Vertex::Vertex() : pos(0,0), visited(false) { }
 
-}
+Vertex::Vertex(double x, double y) : pos(x, y), visited(false) { }
 
-Vertex::Vertex(double x, double y) : pos(x, y), visited(false) {
-
-}
-
-Vertex::~Vertex() {
-}
+Vertex::~Vertex() { }
 
 double Vertex::x() const {
     return this->pos.x;
@@ -68,6 +68,7 @@ void Vertex::addObsPoint(const Point& point) {
 }
 
 Map::Map(int32_t t_width, int32_t t_height) : m_width(t_width), m_height(t_height) {
+    this->m_rtree = new rtree;
 }
 
 Map::~Map() {
@@ -153,6 +154,48 @@ void Map::constructGraph() {
             }
         }
     }
+    this->m_rtree->clear();
+    typedef boost::geometry::model::multi_point<point> multi_point;
+    int i = 0;
+    for (Vertex* v : this->m_list_vertex) {
+        for (Vertex *n : v->neighbors) {
+            if (!n->visited) {
+                multi_point mp;
+                Vector2d vn(n->x() - v->x(), n->y() - v->y());
+                for (Vertex *v0 : {v, n}) {
+                    if (v0->obsPoints.size() > 1) {
+                        Point &n0 = v0->obsPoints[0];
+                        Point &n1 = v0->obsPoints[1];
+                        if (v0->obsPoints.size() > 2) {
+                            for (Point &p : v0->obsPoints) {
+                                Vector2d v0p(p.x - v0->x(),p.y - v0->y());
+                                double rad = angle_rad(v0p, v0 == v ? vn : -vn);
+                                if (rad <= HALF_PI) {
+                                    mp.push_back(point(p.x, p.y));
+                                }
+                            }
+                        } else {
+                            mp.push_back(point(n0.x, n0.y));
+                            mp.push_back(point(n1.x, n1.y));
+                        }
+                    }
+                    mp.push_back(point(v0->x(), v0->y()));
+                }
+                box b = boost::geometry::return_envelope<box>(mp);
+                this->m_rtree->insert(std::make_pair(b, std::vector<Vertex*>({v,n})));
+            }
+        }
+        v->visited = true;
+    }
+}
+
+std::vector<Vertex*> Map::getNearestEdge(const Point& pos) {
+    std::vector<value> result_n;
+    this->m_rtree->query(boost::geometry::index::contains(point(pos.x, pos.y)), std::back_inserter(result_n));
+    if (result_n.size() > 0) {
+        return result_n.front().second;
+    }
+    return std::vector<Vertex*>();
 }
 
 void Map::saveTofile(const std::string &filename) {
