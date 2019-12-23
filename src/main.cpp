@@ -62,7 +62,10 @@ int main(int argc, char const **argv) {
     map.constructGraph();
     MapEditorModel editorModel = {
         font,
-        EditMode::EditVertex};
+        EditMode::EditVertex,
+        0,0,
+        1.0
+    };
     MapView mapView(map, editorModel);
     MapEditor mapEditor(map, editorModel, mapView);
 

@@ -19,6 +19,7 @@ public:
     Obstacle(std::vector<Point> t_listPoint);
     void move(int32_t t_deltaX, int32_t t_deltaY);
     bool contains(int32_t t_posX, int32_t t_posY) const;
+    void removePoint(const Point &t_p);
 };
 
 class Vertex {
@@ -52,6 +53,7 @@ public:
     ~Map();
     // void add_obstacle(const Obstacle & t_obstacle);
     Obstacle* addObstacle(const std::vector<Point>& t_obstacle);
+    void removeObstacle(const Obstacle* t_obs);
     std::vector<Obstacle*> getListObstacle() const;
     void constructGraph();
     std::vector<Vertex*> getGraph() const;

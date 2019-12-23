@@ -12,6 +12,8 @@ private:
     Map &m_map;
     MapView &m_mapView;
     sf::Vector2f m_oldMousePos;
+    bool m_isCtrlDown;
+    bool m_isShiftDown;
 public:
     MapEditorModel &m_editorModel;
     MapEditor(Map &t_map, MapEditorModel &t_model, MapView &t_mapView);

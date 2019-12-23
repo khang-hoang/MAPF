@@ -27,6 +27,17 @@ void Obstacle::move(int32_t t_deltaX, int32_t t_deltaY) {
     }
 }
 
+void Obstacle::removePoint(const Point &t_p) {
+    std::vector<Point>::iterator it = this->listPoint.begin();
+    for (;it != this->listPoint.end();it++) {
+        Point &p = *it;
+        if (p.x == t_p.x && p.y == t_p.y) {
+            this->listPoint.erase(it);
+            return;
+        }
+    }
+}
+
 bool Obstacle::contains(int32_t t_posX, int32_t t_posY) const {
     typedef boost::geometry::model::d2::point_xy<double> point_type;
     typedef boost::geometry::model::polygon<point_type> Polygon;
@@ -248,6 +259,16 @@ Obstacle *Map::addObstacle(const std::vector<Point> &t_listPoint) {
     Obstacle *obs = new Obstacle(t_listPoint);
     this->m_listObstacle.push_back(obs);
     return obs;
+}
+
+void Map::removeObstacle(const Obstacle* t_obs) {
+    std::vector<Obstacle*>::iterator it = this->m_listObstacle.begin();
+    for (;it != this->m_listObstacle.end();it++) {
+        if (*it == t_obs) {
+            this->m_listObstacle.erase(it);
+            return;
+        }
+    }
 }
 
 std::vector<Obstacle*> Map::getListObstacle() const {

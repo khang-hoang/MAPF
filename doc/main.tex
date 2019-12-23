@@ -1,0 +1,157 @@
+\documentclass[12pt]{article}
+\usepackage{vntex}
+\usepackage{a4wide,amssymb,epsfig,latexsym,array,hhline,fancyhdr}
+\usepackage{amsmath}
+\usepackage{amsthm}
+%\usepackage{subfigure}
+
+%{{{ Image captions settings
+% caption italic
+\captionsetup[figure]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=-9pt}
+% space remove between caption, figure, and text
+\captionsetup[table]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=7pt}
+%}}}
+% {{{ header and footer settings
+\setlength{\headheight}{40pt}
+\pagestyle{fancy}
+\fancyhead{} % clear all header fields
+\fancyhead[L]{
+ \begin{tabular}{rl}
+    \begin{picture}(25,15)(0,0)
+    \put(0,-8){\includegraphics[width=8mm, height=8mm]{Images/hcmut.png}}
+    %\put(0,-8){\epsfig{width=10mm,figure=hcmut.eps}}
+   \end{picture}&
+	%\includegraphics[width=8mm, height=8mm]{hcmut.png} & %
+	\begin{tabular}{l}
+		\textbf{\bf \ttfamily Trường Đại Học Bách Khoa Tp.Hồ Chí Minh}\\
+		\textbf{\bf \ttfamily Khoa Khoa Học và Kỹ Thuật Máy Tính}
+	\end{tabular}
+ \end{tabular}
+}
+\fancyhead[R]{
+	\begin{tabular}{l}
+		\tiny \bf \\
+		\tiny \bf
+	\end{tabular}  }
+\fancyfoot{} % clear all footer fields
+\fancyfoot[L]{\scriptsize \ttfamily Báo cáo tiến đô - Đề cương luận văn tốt nghiệp}
+\fancyfoot[R]{\scriptsize \ttfamily Trang {\thepage}/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\footrulewidth}{0.3pt}
+%}}}
+
+\begin{document}
+%{{{ Title Page
+  \begin{titlepage}
+    \begin{center}
+      ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH \\
+      TRƯỜNG ĐẠI HỌC BÁCH KHOA \\
+      KHOA KHOA HỌC - KỸ THUẬT MÁY TÍNH
+    \end{center}
+
+    \vspace{1cm}
+
+    \begin{figure}[h!]
+      \begin{center}
+        \includegraphics[width=3cm]{./Images/hcmut.png}
+      \end{center}
+    \end{figure}
+
+    \vspace{1cm}
+
+    \begin{center}
+      \begin{tabular}{c}
+        \multicolumn{1}{p{14cm}}{\centering{\textbf{{\Large ĐỀ CƯƠNG LUẬN VĂN TỐT NGHIỆP (CO4311)}}}}\\
+        \hline
+        \\
+        \\
+        \multicolumn{1}{p{14cm}}{\centering{\textbf{{\Huge Tìm đường đi cho nhiều đối tượng có ràng buộc }}}}
+        \\
+        \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+    \vspace{1.5cm}
+
+    \begin{table}[h]
+      \begin{tabular}{rrlr}
+        \hspace{7 cm} & GVHD: & Vương Bá Thịnh\\
+        & SVTH: & Hoàng Hồng Khang & 1511466\\
+        & & Nguyễn Hồng Bảo & 1510175
+      \end{tabular}
+    \end{table}
+
+    \vspace{3cm}
+
+    \begin{center}
+      {\footnotesize Tp. Hồ Chí Minh, Tháng 04/2019}
+    \end{center}
+  \end{titlepage}
+%}}}
+%{{{ Table of contents
+  \newpage
+  \tableofcontents
+  \newpage
+%}}}
+\newpage
+  \section{Tổng kết}
+\newpage
+  \section{Tài liệu tham khảo}
+  {\small
+    \begin{thebibliography}{5}
+
+    \bibitem{article1}
+      \href{http://www0.cs.ucl.ac.uk/staff/d.silver/web/Publications\_files/coop-path-AIIDE.pdf}{
+        David Silver. Cooperative pathfinding.
+        AIIDE'05 Proceedings of the First AAAI Conference on Artificial Intelligence and Interactive Digital Entertainment, 2005.
+      }
+
+    \bibitem{article2}
+      \href{http://www.bgu.ac.il/~felner/2013/icts-aij.pdf}{
+        G.Sharon, R.Stern, M.Goldenberga, A.Felnera. The Increasing Cost Tree Search for Optimal Multi-agent Pathfinding.
+        IJCAI, 2012.
+      }
+
+    \bibitem{article3}
+      \href{http://www.bgu.ac.il/~felner/2013/icts-aij.pdf}{
+        G.Sharon, R.Stern, A.Felnera, N.Sturtevant. Conflict-Based Search For Optimal Multi-Agent Path Finding
+        Artif. Intell 219, 2012.
+      }
+
+      \bibitem{article4}
+      \href{http://www-scf.usc.edu/~hangma/pub/icaps18.pdf}{
+        Felner, Ariel et al. Adding Heuristics to Conflict-Based Search for Multi-Agent Path Finding. ICAPS (2018).
+      }
+
+      \bibitem{article5}
+      \href{https://ieeexplore.ieee.org/abstract/document/5980306/}{
+        Phillips, Michael and Maxim Likhachev. SIPP: Safe interval path planning for dynamic environments. 2011 IEEE International Conference on Robotics and Automation (2011): 5628-5635.
+      }
+
+      \bibitem{article6}
+      \href{https://arxiv.org/pdf/1901.05506.pdf}{
+        Andreychuk, Anton \& Yakovlev, Konstantin \& Atzmon, Dor \& Stern, Roni. (2019). Multi-Agent Pathfinding (MAPF) with Continuous Time.
+      }
+
+      \bibitem{book1}
+      \href{https://www.amazon.com/Programming-Example-Wordware-Developers-Library-ebook/dp/B0029LCJXE}{
+        Buckland, Mat. (2019). Programming Game AI by Example / M. Buckland ; pról. de Steven Woodcock..
+      }
+
+      \bibitem{article7}
+	\label{orcaref}
+      \href{http://gamma.cs.unc.edu/ORCA/publications/ORCA.pdf}{
+        Berg, J.P., Guy, S.J., Lin, M.C., \& Manocha, D. (2009). Reciprocal n-Body Collision Avoidance. ISRR.
+      }
+
+      \bibitem{article8}
+      \href{https://arxiv.org/pdf/1710.04296.pdf}{
+	\label{alanref}
+        Godoy, J., Chen, T., Guy, S.J., Karamouzas, I., \& Gini, M.L. (2018). ALAN: adaptive learning for multi-agent navigation. Auton. Robots, 42, 1543-1562.
+      }
+
+    \end{thebibliography}
+  }
+
+\end{document}

@@ -7,6 +7,9 @@
 struct MapEditorModel {
     sf::Font font;
     EditMode editMode;
+    int viewX;
+    int viewY;
+    double zoomLevel;
     Point *selectedVertex;
     Obstacle *selectedObstacle;
 };
