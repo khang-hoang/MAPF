@@ -5,7 +5,8 @@
 #include <iostream>
 #include <iomanip>
 #include "Color.hpp"
-#include "Map.hpp"
+#include "VDMap.hpp"
+#include "DTMap.hpp"
 #include "MapEditor.hpp"
 #include "MapEditorModel.hpp"
 #include "MapView.hpp"
@@ -49,9 +50,12 @@ int main(int argc, char const **argv) {
     }
 
     std::ifstream inFile(inFilename);
-    Map map(MAP_WIDTH, MAP_HEIGHT);
+    DTMap map(MAP_WIDTH, MAP_HEIGHT);
     if (inFile.good()) {
-        map = Map::readFromFile(inFilename);
+        std::vector<std::vector<Point>> listObs = Map::readFromFile(inFilename);
+        for (auto &obs : listObs) {
+            map.addObstacle(obs);
+        }
     }
     // Map map(MAP_WIDTH, MAP_HEIGHT);
     // map.addObstacle({{50, 50}, {50, 200}, {200, 200}, {200,50}});

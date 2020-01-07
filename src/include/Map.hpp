@@ -38,16 +38,11 @@ public:
 };
 
 class Map {
-typedef boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> point;
-typedef boost::geometry::model::box<point> box;
-typedef std::pair<box, std::vector<Vertex*>> value;
-typedef boost::geometry::index::rtree<value, boost::geometry::index::rstar<4>> rtree;
-private:
+protected:
     int32_t m_width;
     int32_t m_height;
     std::vector<Obstacle*> m_listObstacle;
     std::vector<Vertex*> m_list_vertex;
-    rtree *m_rtree;
 public:
     Map(int32_t t_width, int32_t t_height);
     ~Map();
@@ -55,14 +50,13 @@ public:
     Obstacle* addObstacle(const std::vector<Point>& t_obstacle);
     void removeObstacle(const Obstacle* t_obs);
     std::vector<Obstacle*> getListObstacle() const;
-    void constructGraph();
+    virtual void constructGraph() = 0;
     std::vector<Vertex*> getGraph() const;
     std::vector<Vertex*> cloneGraph() const;
     int32_t getWidth() const;
     int32_t getHeight() const;
     void saveTofile(const std::string &filename);
-    static Map readFromFile(const std::string &filename);
-    std::vector<Vertex*> getNearestEdge(const Point& pos);
+    static std::vector<std::vector<Point>> readFromFile(const std::string &filename);
 };
 
 #endif /* Map_hpp */
